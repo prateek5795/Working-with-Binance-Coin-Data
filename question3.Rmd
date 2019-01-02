@@ -1,0 +1,113 @@
+---
+title: "question2s"
+author: "Prateek"
+date: "November 14, 2018"
+output: html_document
+---
+
+```{r}
+
+library(anytime)
+
+tokenBNB <- read.table("networkbnbTX.txt", sep = " ", header = TRUE)
+colnames(tokenBNB) <- c("FromNodeID","ToNodeID","Date","TokenAmount")
+#tokenBNB$Date <- format(as.Date(tokenBNB$Date, format = "%m/%d/%Y"), "%Y-%m-%d")
+tokenBNB$Date <- anydate(tokenBNB$Date)
+head(tokenBNB)
+
+#tokenPrices <- read.csv("bnb_all_time.csv")
+tokenPrices <- read.table("bnb.txt", sep = "\t", header = TRUE)
+colnames(tokenPrices) <- c("Date",	"Open",	"High",	"Low", "Close",	"Volume",	"Market Cap")
+tokenPrices$Date <- format(as.Date(tokenPrices$Date, format = "%m/%d/%Y"), "%Y-%m-%d")
+tokenPrices$Date <- anydate(tokenPrices$Date)
+#tokenPrices$Date <- as.Date(as.POSIXct(tokenPrices$Date, origin="1970-01-01"))
+head(tokenPrices)
+
+```
+
+```{r}
+
+tableJoin <- merge(tokenPrices, tokenBNB)
+head(tableJoin)
+
+```
+
+```{r}
+
+bnbDate <-c(tokenBNB[,3])
+freqDate<-as.data.frame(table(bnbDate))
+colnames(freqDate)<-c("Date","DFrequency")
+freqDate$Date <- anydate(freqDate$Date)
+head(freqDate)
+
+```
+
+```{r}
+tj <- merge(tableJoin, freqDate)
+head(tj)
+
+```
+
+```{r}
+bnbBuyers <- c(tokenBNB[,2])
+freqBuyers <- as.data.frame(table(bnbBuyers))
+colnames(freqBuyers) <- c("ToNodeID","BFrequency")
+freqBuyers$ToNodeID <- as.integer(freqBuyers$ToNodeID)
+View(freqBuyers)
+
+```
+
+```{r}
+tj2 <- merge(tj, freqBuyers)
+head(tj2)
+
+```
+
+```{r}
+bnbSellers <- c(tokenBNB[,1])
+freqSellers <- as.data.frame(table(bnbSellers))
+colnames(freqSellers) <- c("FromNodeID","SFrequency")
+freqSellers$FromNodeID <- as.integer(freqSellers$FromNodeID)
+head(freqSellers)
+
+```
+
+```{r}
+tj3 <- merge(tj2, freqSellers)
+head(tj3)
+
+```
+
+```{r}
+
+# library(magrittr)
+# library(dplyr)
+#   pricebnb_new<- tj %>%
+#      mutate(PriceReturn = (High-lag(High))/lag(High)) %>% as.data.frame %>%
+# setNames(c("Date","Open","High","Low","Close", "Volume", "MarketCap", "FromNodeID", "ToNodeID", "TokenAmount", "DFrequency", "BFrequency"))
+#   
+#   summary(pricebnb_new)
+#  class(pricebnb_new)
+```
+
+```{r}
+library(magrittr)
+library(dplyr)
+
+pricebnb_new <- mutate(tj3, PriceReturn = (Close-lag(Close))/lag(Close))
+summary(pricebnb_new)
+```
+
+```{r}
+Regression_bnb<-lm(PriceReturn ~ DFrequency + BFrequency + SFrequency + Open, data = pricebnb_new)
+#View(Regression_bnb)
+summary(Regression_bnb)
+
+```
+
+#for every one unit of increase in volume, the price return will increase by 0.431087```{r}
+
+```{r}
+#
+
+```

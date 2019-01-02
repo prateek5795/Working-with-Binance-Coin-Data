@@ -1,0 +1,113 @@
+
+<p align = right> Shivani Mankotia : sxm180018</p>
+<p align = right> Prateek Sarna : pxs180012</p>
+<center><h2>ETHEREUM DATASET</h2>
+<h4>Project 1 : Statistical Methods for Data Science</h4> 
+<h4>Token: BNB</h4> </center>
+
+```{r}
+#TOKEN NAME: BNB
+#Total Supply: $1,978,317,006.32
+#Decimals:18
+
+token <- read.table("networkbnbTX.txt", sep =" ", header = FALSE)
+colnames(token) <- c("FromNodeID","ToNodeID","Time","TokenAmount")
+
+#displaying 20 random rows out of almost 36 thousand rows
+token[sample(nrow(token), 20),]
+
+# Removing Outliers for BNB 
+total_supply = 1978317006.32
+decimals = 1000000000000000000
+outliers <- token[(token$TokenAmount > (total_supply * decimals)), ]
+#There are no outlier amounts
+outliers
+
+#Updating token table: Removing outliers (if any)
+token_updated <- token[!(token$TokenAmount > (total_supply * decimals)), ]
+#displaying 20 random rows out of almost 36 thousand rows
+token_updated[sample(nrow(token_updated), 20),]
+```
+
+
+
+```{r}
+library(plyr)
+#FOR SELLING TOKENS
+count_users_sells = count(token_updated, "FromNodeID")
+count_users_sells[sample(nrow(count_users_sells), 20),]
+
+#taking frequency of freq
+counts_sells <- table(count_users_sells$freq)
+
+#taking top 10 values on x-axis 
+barplot(counts_sells,xlim=c(0, 10), main="Number of times a Token was sold", 
+  	xlab="Number of sells",ylab="Number of Users")
+
+#FOR BUYING TOKENS
+count_users_buys = count(token_updated, "ToNodeID")
+count_users_buys[sample(nrow(count_users_buys), 20),]
+
+#taking frequency of freq
+count_buys <- table(count_users_buys$freq)
+
+#taking top 10 values on x-axis 
+barplot(count_buys,xlim=c(0, 10), main="Number of times a Token was bought", 
+  	xlab="Number of buys",ylab="Number of Users")
+
+```
+<br><b>Question1:</b> Find the distribution of how many times a user 1 - buys, 2 - sells a token. Which discrete distribution type fits these distributions best? Estimate distribution parameters. 
+
+```{r}
+library(MASS)
+library(fitdistrplus)
+
+#converting frequency tables to vector form 
+
+count_sells_vector <- as.vector(counts_sells)
+count_buy_vector <- as.vector(count_buys)
+```
+
+According to our observations Poisson Distribution and Negative Binomial Distribution fit our data the best. The following are the graphs for the same: 
+
+```{r}
+library(fitdistrplus)
+
+#Distribution Types for Selling of Tokens
+
+cat("Mean is: " , mean(count_sells_vector), "\n") 
+cat("Variance is: " , var(count_sells_vector), "\n")
+cat("Standard Deviation is: " , sd(count_sells_vector), "\n")
+
+#Negative Binomial
+N.nbinom<-fitdist(count_sells_vector, distr = "nbinom")
+plot(N.nbinom)
+summary(N.nbinom)
+
+#Poisson Distribution
+N.pos <- fitdist(count_sells_vector, distr = "pois")
+plot(N.pos)
+summary(N.pos)
+
+#Distribution Types for Buying of Tokens
+
+cat("Mean is: " , mean(count_buy_vector), "\n") 
+cat("Variance is: " , var(count_buy_vector), "\n")
+cat("Standard Deviation is: " , sd(count_buy_vector), "\n")
+
+#Negative Binomial
+N.nbinom<-fitdist(count_buy_vector, distr = "nbinom")
+plot(N.nbinom)
+summary(N.nbinom)
+
+#Poisson Distribution
+N.pos <- fitdist(count_buy_vector, distr = "pois")
+plot(N.pos)
+summary(N.pos)
+```
+<b>Conclusion:</b>
+According to above graphs, our data best fits Negative Binomial and Poisson Distributions. 
+
+Since, varinace and mean of Poisson Distribution for both Buying and Selling of Tokens in not equal to lambda, hence Poisson will not be the appropriate fit. 
+
+It fits Negative Binomial Distribution the best.  

@@ -1,0 +1,156 @@
+<p align = right> Shivani Mankotia : sxm180018</p>
+<p align = right> Prateek Sarna : pxs180012</p>
+<center><h2>ETHEREUM DATASET</h2>
+<h4>Project 1 : Statistical Methods for Data Science</h4> 
+<h4>Token: BNB</h4> </center>
+
+```{r}
+
+library(anytime)
+
+tokenBNB <- read.table("networkbnbTX.txt", sep = " ", header = TRUE)
+colnames(tokenBNB) <- c("FromNodeID","ToNodeID","Date","TokenAmount")
+#tokenBNB$Date <- format(as.Date(tokenBNB$Date, format = "%m/%d/%Y"), "%Y-%m-%d")
+tokenBNB$Date <- anydate(tokenBNB$Date)
+head(tokenBNB)
+
+#tokenPrices <- read.csv("bnb_all_time.csv")
+tokenPrices <- read.table("bnb.txt", sep = "\t", header = TRUE)
+colnames(tokenPrices) <- c("Date",	"Open",	"High",	"Low", "Close",	"Volume",	"Market Cap")
+tokenPrices$Date <- format(as.Date(tokenPrices$Date, format = "%m/%d/%Y"), "%Y-%m-%d")
+tokenPrices$Date <- anydate(tokenPrices$Date)
+#tokenPrices$Date <- as.Date(as.POSIXct(tokenPrices$Date, origin="1970-01-01"))
+head(tokenPrices)
+```
+
+```{r}
+#Frequency Vs TokenAmount
+library(dplyr)
+df <- tokenBNB %>%
+  group_by(TokenAmount) %>%
+  summarize(counts = n())
+
+df
+#Plot of the entire data
+plot(df)
+```
+<p>We constructed layers based on how concentrated the data was. In this chunk of code, we plotted Frequency vs TokenAmount graph which gave us visual estimation of the same.</p>
+```{r}
+
+#TEST LAYERS
+#layer1 <- token[which(token$TokenAmount > 5e+24 & token$TokenAmount <= 2e+25), ]
+#layer2 <- token[which(token$TokenAmount > 2e+24 & token$TokenAmount <= 5e+24),]
+#layer3 <- token[which(token$TokenAmount > 1e+24 & token$TokenAmount <= 2e+24),]
+#layer4 <- token[which(token$TokenAmount > 8e+23 & token$TokenAmount <= 1e+24),]
+#layer5 <- token[which(token$TokenAmount > 4e+23 & token$TokenAmount <= 8e+23),]
+#layer6 <- token[which(token$TokenAmount > 3e+23 & token$TokenAmount <= 4e+23),]
+#layer7 <- token[which(token$TokenAmount > 2.5e+23 & token$TokenAmount <= 3e+23),]
+#layer8 <- token[which(token$TokenAmount > 2e+23 & token$TokenAmount <= 2.5e+23),]
+#layer9 <- token[which(token$TokenAmount > 1.5e+23 & token$TokenAmount <= 2e+23),]
+#layer10 <- token[which(token$TokenAmount > 1e+23 & token$TokenAmount <= 1.5e+23),]
+#layer11 <- token[which(token$TokenAmount > 8e+22 & token$TokenAmount <= 1e+23),]
+#layer12 <- token[which(token$TokenAmount > 7e+22 & token$TokenAmount <= 8e+22),]
+#layer13 <- token[which(token$TokenAmount > 6e+22 & token$TokenAmount <= 7e+22),]
+#layer14 <- token[which(token$TokenAmount > 5.5e+22 & token$TokenAmount <= 6e+22),]
+#layer15 <- token[which(token$TokenAmount > 5e+22 & token$TokenAmount <= 5.5e+22),]
+#layer16 <- token[which(token$TokenAmount > 4.5e+22 & token$TokenAmount <= 5e+22),]
+#layer17 <- token[which(token$TokenAmount > 4e+22 & token$TokenAmount <= 4.5e+22),]
+#layer18 <- token[which(token$TokenAmount > 3.5e+22 & token$TokenAmount <= 4e+22),]
+#layer19 <- token[which(token$TokenAmount > 3e+22 & token$TokenAmount <= 3.5e+22),]
+#layer20 <- token[which(token$TokenAmount > 2.75e+22 & token$TokenAmount <= 3e+22),]
+#layer21 <- token[which(token$TokenAmount > 2.5e+22 & token$TokenAmount <= 2.75e+22),]
+#layer22 <- token[which(token$TokenAmount > 2.25e+22 & token$TokenAmount <= 2.5e+22),]
+#layer23 <- token[which(token$TokenAmount > 2e+22 & token$TokenAmount <= 2.25e+22),]
+# Layers 24 - 28 have the most concentrated data points. 
+#layer24 <- token[which(token$TokenAmount > 1.5e+22 & token$TokenAmount <= 2e+22), ] 
+#layer25 <- token[which(token$TokenAmount > 1.0e+22 & token$TokenAmount <= 1.5e+22), ]
+#layer26 <- token[which(token$TokenAmount > 5.0e+21 & token$TokenAmount <= 1.0e+22), ]
+#layer27 <- token[which(token$TokenAmount > 1.0e+22 & token$TokenAmount <= 1.5e+22), ]
+#layer28 <- token[which(token$TokenAmount > 0 & token$TokenAmount <= 5.0e+21), ]
+
+
+
+#Chosen layer for testing the co-relation coefficients. 
+layer<- tokenBNB[which(tokenBNB$TokenAmount>1e+18 & tokenBNB$TokenAmount<=1e+21),]
+df2 <-layer %>%
+  group_by(TokenAmount) %>%
+  summarize(counts = n())
+#Plot of the chosen layer
+df2 <- df2[df2$counts <= 400, ]
+head(df2)
+plot(df2)
+
+```
+```{r}
+
+# df3 <- data.frame(table(layer$TokenAmount))
+# colnames(df3) <- c("TokenAmount", "Count")
+# #df3 <- df3[df3$Count <= 400, ]
+# head(df3)
+# plot(df3)
+
+```
+
+
+By visual observation, this layer has the maximun concentration of data. 
+
+```{r}
+library(ggplot2)
+
+layerDate <-c(layer[,3])
+count_layerDate<-as.data.frame(table(layerDate))
+colnames(count_layerDate)<-c("Date","Frequency")
+count_layerDate$Date <- as.Date(anydate(count_layerDate$Date))
+
+#Joining the two tables using inner join
+tableJoin <- merge(count_layerDate, tokenPrices)
+
+df <- data.frame(tableJoin$Date, tableJoin$High, tableJoin$Frequency)
+plot(x = df$tableJoin.Date, y = df$tableJoin.High)
+#ggplot(data = df, aes(x = df$tableJoin.Date, y = df$tableJoin.High))
+
+```
+<p>The above graph is a plot of Date vs Price: High. 
+
+We tested our data on all the three Correlation Coefficients: Pearson, Spearman and Kendall. 
+Below are the results with corresponding graphs:</p>
+
+```{r}
+library(ggplot2)
+library(ggpubr)
+#PEARSON cO-RELATION
+cor.test(df$tableJoin.High, df$tableJoin.Frequency, method = "pearson")
+
+ggscatter(df, x = "tableJoin.Date", y = "tableJoin.High", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "Date", ylab = "Price(High)")
+
+#SPEARMAN CO-RELATION
+cor.test(df$tableJoin.High, df$tableJoin.Frequency, method = "spearman")
+
+ggscatter(df, x = "tableJoin.Date", y = "tableJoin.High", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "spearman",
+          xlab = "Date", ylab = "Price(High)")
+
+#KENDALL C0-RELATION
+cor.test(df$tableJoin.High, df$tableJoin.Frequency, method = "kendall")
+
+ggscatter(df, x = "tableJoin.Date", y = "tableJoin.High", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "kendall",
+          xlab = "Date", ylab = "Price(High)")
+
+```
+<p><b> Conclusion: </b>
+According to above results, the Spearman Correlation gives us the highest coefficent value. 
+
+The following are the results obatined:<br> 
+Pearson : cor 0.5030097<br>
+Spearman: rho 0.7264976<br>
+Kendall: tau 0.5234409</p>
+
+
+
+
