@@ -4,9 +4,9 @@ Statistical Methods for Data Science
 Fall 2018  
 Project: Working with Binance Coin Dataset  
 
-Authors -  
-Prateek Sarna (pxs180012@utdallas.edu)
-Shivani Mankotia (sxm180018@utdallas.edu) (https://github.com/12ani)
+Authors
+- Prateek Sarna (pxs180012@utdallas.edu)
+- Shivani Mankotia (sxm180018@utdallas.edu) (https://github.com/12ani)
 
 Data Description
 - Our data files contain two primary groups: token network edge files, and token price files. The Ethereum project is a         blockchain platform, and our data comes from there. Although Ethereum started in 2015, most tokens have been created since     2016. As such, tokens have different starting dates, and their data starts from that initial date.
