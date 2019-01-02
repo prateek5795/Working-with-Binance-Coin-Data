@@ -25,3 +25,10 @@ Authors
 - Once you create layers, you can compute a feature in each layer. An example feature is the number of transactions, another     one is the number of unique buyers. 
 - As each edge has a unix timestamp, it is easy to compute the edge time to a date. For     example, 1294226315 is equivalent   to 01/05/2011 @ 11:18am (UTC). See the website https://www.unixtimestamp.com/index.php for   unix time conversion. R has       functions to compute dates from unix time stamps as well. This way, for a given day you can find   all layer transactions in   that day. For example, you can say on 10/12/2018 there were 25 transactions in layer 1. The price of token on that date was   3.2$. For each day in a token’s history, you can then correlate price vs feature in time.
 - Find an algorithm to compute the correlation of price data with each of the layers (hint: start by looking at Pearson         correlation).
+
+# Question 3
+- We denote the token price in dollar as Pt for the t-th day. Simple price return is given as (Pt−Pt−1)/Pt−1.
+- Extract at least three features from the token network at day t−1 and create a multiple linear regression model to explain     price return on day t.
+- You are free to choose any feature (regressor). Your features can be in terms of numbers (x1 = number of transactions),       percentages (x1 = percentage of investors who bought more than 10 tokens), etc. Similarly, you could transform your           regressors (x1 = square root of number of transactions).
+- Finding which features to extract from a dataset is called feature engineering.
+- Present your regression model, explain residuals and discuss your findings. Explain the adequacy of your regression model.
