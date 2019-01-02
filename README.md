@@ -2,7 +2,7 @@
 
 Statistical Methods for Data Science  
 Fall 2018  
-Project: Working with Binance Coin Dataset  
+Project: Working with Binance Coin Data  
 
 Authors
 - Prateek Sarna (pxs180012@utdallas.edu)
